@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace HyperTools
 {
@@ -9,33 +7,21 @@ namespace HyperTools
      * This handles both Mouse and Touch inputs!
      * (Let's call them Presses for simplicity.)
      *
-     * To use this bad boy, just add it to the root GameObject you want to pick up raycast Presses from,
-     * then just add listeners for any of the 3 Press events.
+     * To use this bad boy, ust add listeners for any of the 3 Press events.
      *
-     * Treat the Interactable property like you would on a UI element, so it can be disabled as needed for gane logic.
+     * Treat the Interactable property like you would on a UI element, so it can be disabled as needed for game logic.
      *
-     * The Target property is optional, and can be used to raycast Presses on Graphics have that Target GameObject as an
-     * ancestor. This is so you can have a PressInputHandler on a totally different GameObject for organization reasons,
-     * or for working easily with presses on other GameObjects created at runtime.
      */
     public class PressInputHandler : MonoBehaviour
     {
         public bool Interactable;
-        public GameObject Target;
 
         private bool _isInteracting;
         private float _interactionDuration;
 
-        private Camera _mainCamera;
-
         public event Action<Vector3> OnPressStart; // <input position>
         public event Action<Vector3, float> OnPressHeld; // <input position, held duration in seconds>
         public event Action<Vector3> OnPressEnd; // <input position>
-
-        private void Start()
-        {
-            _mainCamera = Camera.main;
-        }
 
         private void Update()
         {
@@ -47,25 +33,19 @@ namespace HyperTools
             // Detect the start of interaction
             if (IsInputStart(out Vector3 inputPosition))
             {
-                if (IsOverUIElement(inputPosition) || IsOverGameObject(inputPosition))
-                {
-                    _isInteracting = true;
-                    _interactionDuration = 0f; // Reset duration
-                    OnPressStart?.Invoke(inputPosition);
-                }
+                _isInteracting = true;
+                _interactionDuration = 0f; // Reset duration
+                OnPressStart?.Invoke(inputPosition);
             }
             // Detect ongoing interaction
-            else if (IsInputHold(out inputPosition))
+            else if (_isInteracting)
             {
-                if (_isInteracting)
+                if  (IsInputHold(out inputPosition))
                 {
                     _interactionDuration += Time.deltaTime;
                     OnPressHeld?.Invoke(inputPosition, _interactionDuration);
                 }
-            }
-            else if (IsInputEnd(out inputPosition))
-            {
-                if (_isInteracting)
+                else if (IsInputEnd(out inputPosition))
                 {
                     _isInteracting = false;
                     OnPressEnd?.Invoke(inputPosition);
@@ -129,44 +109,6 @@ namespace HyperTools
             {
                 inputPosition = Input.GetTouch(0).position;
                 return true;
-            }
-
-            return false;
-        }
-
-        // Check if the input started over this GameObject (using GraphicRaycaster)
-        private bool IsOverUIElement(Vector2 inputPosition)
-        {
-            PointerEventData pointerEventData = new PointerEventData(EventSystem.current)
-            {
-                position = inputPosition
-            };
-
-            List<RaycastResult> results = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(pointerEventData, results);
-
-            var ancestor = Target ?? gameObject;
-            if (results.Count > 0 && Utilities.HasAncestorGameObject(results[0].gameObject, ancestor))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        // Check if the input started over this GameObject (using raycasting)
-        private bool IsOverGameObject(Vector3 inputPosition)
-        {
-            if (_mainCamera == null)
-            {
-                return false;
-            }
-
-            Ray ray = _mainCamera.ScreenPointToRay(inputPosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                return hit.transform == transform;
             }
 
             return false;
