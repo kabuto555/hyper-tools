@@ -56,7 +56,7 @@ namespace HyperTools
             }
         }
 
-        public static void AddController(string key, ControllerBehaviour controller)
+        public static void AddController(ControllerBehaviour controller)
         {
             var entry = new ControllerEntry
             {
