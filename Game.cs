@@ -7,19 +7,19 @@ namespace HyperTools
     public class Game : MonoBehaviour
     {
         [Serializable]
-        private class ControllerEntry
+        private class ServiceEntry
         {
             public Type Interface;
-            public ControllerBehaviour Controller;
+            public ServiceBehaviour Service;
         }
 
         private static Game Instance { get; set; }
-        private static readonly Queue<ControllerEntry> PendingControllers = new();
+        private static readonly Queue<ServiceEntry> PendingServices = new();
 
-        [SerializeField] private List<ControllerEntry> Controllers;
+        [SerializeField] private List<ServiceEntry> Services;
         [SerializeField] private AudioController AudioController;
 
-        private readonly Dictionary<Type, ControllerBehaviour> _controllerMappingByType = new();
+        private readonly Dictionary<Type, ServiceBehaviour> _serviceMappingByType = new();
 
         public static AudioController Audio => Instance.AudioController;
 
@@ -47,57 +47,57 @@ namespace HyperTools
             // Add any additional Systems initialization here:
 
             // Custom game Systems initializations
-            Controllers.AddRange(PendingControllers);
-            PendingControllers.Clear();
+            Services.AddRange(PendingServices);
+            PendingServices.Clear();
 
-            foreach (var entry in Controllers)
+            foreach (var entry in Services)
             {
-                AddControllerEntry(entry, false);
+                AddServiceEntry(entry, false);
             }
         }
 
-        public static void AddController(ControllerBehaviour controller)
+        public static void AddService(ServiceBehaviour service)
         {
-            var entry = new ControllerEntry
+            var entry = new ServiceEntry
             {
-                Controller = controller,
-                Interface = controller.ControllerInterface,
+                Service = service,
+                Interface = service.ServiceInterface,
             };
 
             if (Instance == null)
             {
-                PendingControllers.Enqueue(entry);
+                PendingServices.Enqueue(entry);
                 return;
             }
 
-            AddControllerEntry(entry, true);
+            AddServiceEntry(entry, true);
         }
 
-        private static void AddControllerEntry(ControllerEntry entry, bool addToMainControllerList)
+        private static void AddServiceEntry(ServiceEntry entry, bool addToMainServiceList)
         {
-            Instance._controllerMappingByType[entry.Interface] = entry.Controller;
-            if (addToMainControllerList)
+            Instance._serviceMappingByType[entry.Interface] = entry.Service;
+            if (addToMainServiceList)
             {
-                Instance.Controllers.Add(entry);
+                Instance.Services.Add(entry);
             }
             
-            entry.Controller.Initialize();
+            entry.Service.Initialize();
         }
 
-        public static void RemoveController(ControllerBehaviour controller)
+        public static void RemoveService(ServiceBehaviour service)
         {
             if (Instance == null)
             {
                 return;
             }
 
-            Instance._controllerMappingByType.Remove(controller.ControllerInterface);
-            Instance.Controllers.RemoveAll(x => x.Interface == controller.ControllerInterface);
+            Instance._serviceMappingByType.Remove(service.ServiceInterface);
+            Instance.Services.RemoveAll(x => x.Interface == service.ServiceInterface);
         }
 
-        public static T GetController<T>() where T : ControllerBehaviour
+        public static T GetService<T>() where T : ServiceBehaviour
         {
-            return (T)Instance._controllerMappingByType[typeof(T)];
+            return (T)Instance._serviceMappingByType[typeof(T)];
         }
     }
 }

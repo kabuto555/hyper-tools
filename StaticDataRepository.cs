@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace HyperTools
 {
-    public abstract class StaticDataRepository : ControllerBehaviour
+    public abstract class StaticDataRepository : ServiceBehaviour
     {
         private Dictionary<Type, object> _databasesByType;
         private Dictionary<Type, object> _catalogsByType;

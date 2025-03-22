@@ -3,20 +3,20 @@ using UnityEngine;
 
 namespace HyperTools
 {
-    public abstract class ControllerBehaviour : MonoBehaviour
+    public abstract class ServiceBehaviour : MonoBehaviour
     {
-        public abstract Type ControllerInterface { get; }
+        public abstract Type ServiceInterface { get; }
 
         public abstract void Initialize();
 
         protected virtual void Awake()
         {
-            Game.AddController(this);
+            Game.AddService(this);
         }
 
         protected virtual void OnDestroy()
         {
-            Game.RemoveController(this);
+            Game.RemoveService(this);
         }
     }
 }
