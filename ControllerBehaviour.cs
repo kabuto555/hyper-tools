@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace HyperTools
@@ -5,6 +6,7 @@ namespace HyperTools
     public abstract class ControllerBehaviour : MonoBehaviour
     {
         protected abstract string ControllerKey { get; }
+        public abstract Type ControllerInterface { get; }
 
         public abstract void Initialize();
 
@@ -15,7 +17,7 @@ namespace HyperTools
 
         protected virtual void OnDestroy()
         {
-            Game.RemoveController(ControllerKey);
+            Game.RemoveController(this);
         }
     }
 }

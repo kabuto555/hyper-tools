@@ -9,7 +9,7 @@ namespace HyperTools
         [Serializable]
         private class ControllerEntry
         {
-            public string Key;
+            public Type Interface;
             public ControllerBehaviour Controller;
         }
 
@@ -19,7 +19,7 @@ namespace HyperTools
         [SerializeField] private List<ControllerEntry> Controllers;
         [SerializeField] private AudioController AudioController;
 
-        private readonly Dictionary<string, ControllerBehaviour> _controllerMapping = new();
+        private readonly Dictionary<Type, ControllerBehaviour> _controllerMappingByType = new();
 
         public static AudioController Audio => Instance.AudioController;
 
@@ -52,9 +52,7 @@ namespace HyperTools
 
             foreach (var entry in Controllers)
             {
-                var controller = entry.Controller;
-                Instance._controllerMapping[entry.Key] = controller;
-                controller.Initialize();
+                AddControllerEntry(entry, false);
             }
         }
 
@@ -62,8 +60,8 @@ namespace HyperTools
         {
             var entry = new ControllerEntry
             {
-                Key = key,
-                Controller = controller
+                Controller = controller,
+                Interface = controller.ControllerInterface,
             };
 
             if (Instance == null)
@@ -72,25 +70,34 @@ namespace HyperTools
                 return;
             }
 
-            Instance._controllerMapping[key] = controller;
-            Instance.Controllers.Add(entry);
-            controller.Initialize();
+            AddControllerEntry(entry, true);
         }
 
-        public static void RemoveController(string key)
+        private static void AddControllerEntry(ControllerEntry entry, bool addToMainControllerList)
+        {
+            Instance._controllerMappingByType[entry.Interface] = entry.Controller;
+            if (addToMainControllerList)
+            {
+                Instance.Controllers.Add(entry);
+            }
+            
+            entry.Controller.Initialize();
+        }
+
+        public static void RemoveController(ControllerBehaviour controller)
         {
             if (Instance == null)
             {
                 return;
             }
 
-            Instance._controllerMapping.Remove(key);
-            Instance.Controllers.RemoveAll(x => x.Key == key);
+            Instance._controllerMappingByType.Remove(controller.ControllerInterface);
+            Instance.Controllers.RemoveAll(x => x.Interface == controller.ControllerInterface);
         }
 
-        public static ControllerBehaviour GetController(string key)
+        public static T GetController<T>() where T : ControllerBehaviour
         {
-            return Instance._controllerMapping[key];
+            return (T)Instance._controllerMappingByType[typeof(T)];
         }
     }
 }
