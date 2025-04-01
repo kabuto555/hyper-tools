@@ -75,6 +75,12 @@ namespace HyperTools
 
         private static void AddServiceEntry(ServiceEntry entry, bool addToMainServiceList)
         {
+            if (Instance._serviceMappingByType.ContainsKey(entry.Interface))
+            {
+                // Don't want to add an extra service we already have (let it destroy itself)
+                return;
+            }
+            
             Instance._serviceMappingByType[entry.Interface] = entry.Service;
             if (addToMainServiceList)
             {

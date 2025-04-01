@@ -13,10 +13,5 @@ namespace HyperTools
         {
             Game.AddService(this);
         }
-
-        protected virtual void OnDestroy()
-        {
-            Game.RemoveService(this);
-        }
     }
 }
