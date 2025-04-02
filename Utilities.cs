@@ -20,6 +20,30 @@ namespace HyperTools
             return z0 * standardDeviation + mean;
         }
 
+        public static int GetWeightedRoll(float[] weights)
+        {
+            var sum = 0f;
+            
+            foreach (var x in weights)
+            {
+                sum += x;
+            }
+
+            var drop = Random.value * sum;
+            var checkedArea = 0f;
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                checkedArea += weights[i];
+                if (drop <= checkedArea)
+                {
+                    return i;
+                }
+            }
+            
+            return weights.Length - 1;
+        }
+
         public static void Shuffle<T>(List<T> list, bool useUnityRandom = true)
         {
             var random = useUnityRandom ? null : new System.Random();
