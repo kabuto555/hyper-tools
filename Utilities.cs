@@ -118,5 +118,20 @@ namespace HyperTools
 
             return sprite;
         }
+
+        public static Vector2 WorldToCanvasLocalPosition(Vector3 worldPosition, Canvas canvas, Camera camera = null)
+        {
+            if (camera == null)
+            {
+                camera = Camera.main;
+            }
+            
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(camera, worldPosition);
+            RectTransform canvasRect = (RectTransform)canvas.transform;
+            
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : camera, out var localPoint);
+            
+            return localPoint;
+        }
     }
 }
