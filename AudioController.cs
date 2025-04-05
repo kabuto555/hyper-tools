@@ -24,12 +24,12 @@ namespace HyperTools
             }
         }
 
-        public void PlayMusic(AudioClip clip, float volume = 1.0f)
+        public void PlayMusic(AudioClip clip, float volume = 1.0f, bool loop = true)
         {
             if (!MusicAudioSource.isPlaying)
             {
                 MusicAudioSource.clip = clip;
-                MusicAudioSource.loop = true;
+                MusicAudioSource.loop = loop;
                 MusicAudioSource.volume = volume;
                 MusicAudioSource.Play();
             }
