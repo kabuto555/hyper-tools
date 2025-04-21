@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace HyperTools
 {
@@ -7,14 +9,14 @@ namespace HyperTools
      * This handles both Mouse and Touch inputs!
      * (Let's call them Presses for simplicity.)
      *
-     * To use this bad boy, ust add listeners for any of the 3 Press events.
+     * To use this bad boy, just add listeners for any of the 3 Press events.
      *
-     * Treat the Interactable property like you would on a UI element, so it can be disabled as needed for game logic.
+     * Treat the interactable property like you would on a UI element, so it can be disabled as needed for game logic.
      *
      */
     public class PressInputHandler : MonoBehaviour
     {
-        public bool Interactable;
+        public bool interactable;
 
         private bool _isInteracting;
         private float _interactionDuration;
@@ -25,7 +27,7 @@ namespace HyperTools
 
         private void Update()
         {
-            if (!Interactable)
+            if (!interactable)
             {
                 return;
             }
@@ -58,15 +60,15 @@ namespace HyperTools
         {
             inputPosition = Vector3.zero;
 
-            if (Input.GetMouseButtonDown(0))
+            if (Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
             {
-                inputPosition = Input.mousePosition;
+                inputPosition = Pointer.current.position.ReadValue();
                 return true;
             }
-
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            
+            if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
             {
-                inputPosition = Input.GetTouch(0).position;
+                inputPosition = Touchscreen.current.primaryTouch.position.ReadValue();
                 return true;
             }
 
@@ -78,16 +80,16 @@ namespace HyperTools
         {
             inputPosition = Vector3.zero;
 
-            if (Input.GetMouseButton(0))
+            if (Pointer.current != null && Pointer.current.press.isPressed)
             {
-                inputPosition = Input.mousePosition;
+                inputPosition = Pointer.current.position.ReadValue();
                 return true;
             }
 
-            if (Input.touchCount > 0)
+            if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
             {
-                inputPosition = Input.GetTouch(0).position;
-                var touchPhase = Input.GetTouch(0).phase;
+                inputPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+                var touchPhase = Touchscreen.current.primaryTouch.phase.ReadValue();
                 return touchPhase == TouchPhase.Stationary || touchPhase == TouchPhase.Moved;
             }
 
@@ -99,15 +101,15 @@ namespace HyperTools
         {
             inputPosition = Vector3.zero;
 
-            if (Input.GetMouseButtonUp(0))
+            if (Pointer.current != null && Pointer.current.press.wasReleasedThisFrame)
             {
-                inputPosition = Input.mousePosition;
+                inputPosition = Pointer.current.position.ReadValue();
                 return true;
             }
 
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
+            if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasReleasedThisFrame)
             {
-                inputPosition = Input.GetTouch(0).position;
+                inputPosition = Touchscreen.current.primaryTouch.position.ReadValue();
                 return true;
             }
 
