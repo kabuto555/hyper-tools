@@ -18,10 +18,10 @@ namespace HyperTools
             InitializeDictionariesFromJsonFiles();
         }
 
-        protected virtual void InitializeDictionariesFromJsonFiles()
-        {
-            // Should be implemented by child classes by calling CreateDictionaryFromJsonFile as needed
-        }
+        /// <summary>
+        /// Should be implemented by child classes by calling CreateDictionaryFromJsonFile as needed
+        /// </summary>
+        protected abstract void InitializeDictionariesFromJsonFiles();
     
         protected void CreateDictionaryFromJsonFile<T>(string resourcePath) where T : IDataObject
         {
