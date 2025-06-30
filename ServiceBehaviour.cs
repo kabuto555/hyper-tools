@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace HyperTools
@@ -7,7 +8,7 @@ namespace HyperTools
     {
         public abstract Type ServiceInterface { get; }
 
-        public abstract void Initialize();
+        public abstract UniTask Initialize();
 
         protected virtual void Awake()
         {

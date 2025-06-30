@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace HyperTools
@@ -104,6 +105,11 @@ namespace HyperTools
         public static T GetService<T>() where T : ServiceBehaviour
         {
             return (T)Instance._serviceMappingByType[typeof(T)];
+        }
+
+        public static async UniTask WaitForServiceInitialization<T>() where T : ServiceBehaviour
+        {
+            await UniTask.WaitUntil(() => Instance._serviceMappingByType.ContainsKey(typeof(T)));
         }
     }
 }

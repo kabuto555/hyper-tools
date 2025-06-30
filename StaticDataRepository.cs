@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -10,12 +11,14 @@ namespace HyperTools
         private Dictionary<Type, object> _databasesByType;
         private Dictionary<Type, object> _catalogsByType;
     
-        public override void Initialize()
+        public override UniTask Initialize()
         {
             _databasesByType = new Dictionary<Type, object>();
             _catalogsByType = new Dictionary<Type, object>();
 
             InitializeDictionariesFromJsonFiles();
+            
+            return UniTask.CompletedTask;
         }
 
         /// <summary>
