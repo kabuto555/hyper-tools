@@ -21,6 +21,7 @@ namespace HyperTools
         [SerializeField] private AudioController AudioController;
 
         private readonly Dictionary<Type, ServiceBehaviour> _serviceMappingByType = new();
+        private readonly Dictionary<Type, bool> _serviceInitializationMappingByType = new();
 
         public static AudioController Audio => Instance.AudioController;
 
@@ -88,7 +89,11 @@ namespace HyperTools
                 Instance.Services.Add(entry);
             }
             
-            entry.Service.Initialize();
+            UniTask.Void(async () =>
+            {
+                await entry.Service.Initialize();
+                Instance._serviceInitializationMappingByType[entry.Interface] = true;
+            });
         }
 
         public static void RemoveService(ServiceBehaviour service)
@@ -109,7 +114,7 @@ namespace HyperTools
 
         public static async UniTask WaitForServiceInitialization<T>() where T : ServiceBehaviour
         {
-            await UniTask.WaitUntil(() => Instance._serviceMappingByType.ContainsKey(typeof(T)));
+            await UniTask.WaitUntil(() => Instance._serviceInitializationMappingByType.GetValueOrDefault(typeof(T), false));
         }
     }
 }
