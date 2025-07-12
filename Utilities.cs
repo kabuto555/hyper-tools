@@ -114,6 +114,11 @@ namespace HyperTools
             await resourceRequest.ToUniTask();
 
             var sprite = resourceRequest.asset as Sprite;
+            if (sprite == null)
+            {
+                Debug.LogError($"Failed to load sprite {spritePath}");
+            }
+            
             onComplete?.Invoke(sprite);
 
             return sprite;
