@@ -112,9 +112,11 @@ namespace HyperTools
             return (T)Instance._serviceMappingByType[typeof(T)];
         }
 
-        public static async UniTask WaitForServiceInitialization<T>() where T : ServiceBehaviour
+        public static async UniTask<T> WaitForServiceInitialization<T>() where T : ServiceBehaviour
         {
             await UniTask.WaitUntil(() => Instance._serviceInitializationMappingByType.GetValueOrDefault(typeof(T), false));
+            
+            return GetService<T>();
         }
     }
 }
