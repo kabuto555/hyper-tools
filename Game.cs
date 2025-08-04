@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace HyperTools
 {
@@ -11,19 +12,19 @@ namespace HyperTools
         private class ServiceEntry
         {
             public Type Interface;
-            public ServiceBehaviour Service;
+            [FormerlySerializedAs("Service")] public ServiceBehaviour service;
         }
 
         private static Game Instance { get; set; }
         private static readonly Queue<ServiceEntry> PendingServices = new();
 
-        [SerializeField] private List<ServiceEntry> Services;
-        [SerializeField] private AudioController AudioController;
+        [FormerlySerializedAs("Services")] [SerializeField] private List<ServiceEntry> services;
+        [FormerlySerializedAs("AudioController")] [SerializeField] private AudioController audioController;
 
         private readonly Dictionary<Type, ServiceBehaviour> _serviceMappingByType = new();
         private readonly Dictionary<Type, bool> _serviceInitializationMappingByType = new();
 
-        public static AudioController Audio => Instance.AudioController;
+        public static AudioController Audio => Instance.audioController;
 
         private void Awake()
         {
@@ -49,10 +50,10 @@ namespace HyperTools
             // Add any additional Systems initialization here:
 
             // Custom game Systems initializations
-            Services.AddRange(PendingServices);
+            services.AddRange(PendingServices);
             PendingServices.Clear();
 
-            foreach (var entry in Services)
+            foreach (var entry in services)
             {
                 AddServiceEntry(entry, false);
             }
@@ -62,7 +63,7 @@ namespace HyperTools
         {
             var entry = new ServiceEntry
             {
-                Service = service,
+                service = service,
                 Interface = service.ServiceInterface,
             };
 
@@ -83,15 +84,15 @@ namespace HyperTools
                 return;
             }
             
-            Instance._serviceMappingByType[entry.Interface] = entry.Service;
+            Instance._serviceMappingByType[entry.Interface] = entry.service;
             if (addToMainServiceList)
             {
-                Instance.Services.Add(entry);
+                Instance.services.Add(entry);
             }
             
             UniTask.Void(async () =>
             {
-                await entry.Service.Initialize();
+                await entry.service.Initialize();
                 Instance._serviceInitializationMappingByType[entry.Interface] = true;
             });
         }
@@ -104,7 +105,7 @@ namespace HyperTools
             }
 
             Instance._serviceMappingByType.Remove(service.ServiceInterface);
-            Instance.Services.RemoveAll(x => x.Interface == service.ServiceInterface);
+            Instance.services.RemoveAll(x => x.Interface == service.ServiceInterface);
         }
 
         public static T GetService<T>() where T : ServiceBehaviour

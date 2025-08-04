@@ -1,12 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace HyperTools
 {
     public class AudioController : MonoBehaviour
     {
-        [SerializeField] private AudioSource MusicAudioSource;
-        [SerializeField] private AudioSource SfxAudioSource;
+        [FormerlySerializedAs("MusicAudioSource")] [SerializeField] private AudioSource musicAudioSource;
+        [FormerlySerializedAs("SfxAudioSource")] [SerializeField] private AudioSource sfxAudioSource;
 
         private bool _isApplicationPaused;
 
@@ -16,22 +17,22 @@ namespace HyperTools
 
             if (pauseStatus)
             {
-                MusicAudioSource.Pause();
+                musicAudioSource.Pause();
             }
             else
             {
-                MusicAudioSource.UnPause();
+                musicAudioSource.UnPause();
             }
         }
 
         public void PlayMusic(AudioClip clip, float volume = 1.0f, bool loop = true)
         {
-            if (!MusicAudioSource.isPlaying)
+            if (!musicAudioSource.isPlaying)
             {
-                MusicAudioSource.clip = clip;
-                MusicAudioSource.loop = loop;
-                MusicAudioSource.volume = volume;
-                MusicAudioSource.Play();
+                musicAudioSource.clip = clip;
+                musicAudioSource.loop = loop;
+                musicAudioSource.volume = volume;
+                musicAudioSource.Play();
             }
             else
             {
@@ -43,7 +44,7 @@ namespace HyperTools
         {
             float time = 0;
 
-            var oldAudioSource = MusicAudioSource;
+            var oldAudioSource = musicAudioSource;
             var oldAudioVolume = oldAudioSource.volume;
             var newAudioSource = gameObject.AddComponent<AudioSource>();
             newAudioSource.playOnAwake = false;
@@ -51,7 +52,7 @@ namespace HyperTools
             newAudioSource.loop = true;
             newAudioSource.volume = 0;
             newAudioSource.Play();
-            MusicAudioSource = newAudioSource;
+            musicAudioSource = newAudioSource;
 
             yield return null;
 
@@ -94,14 +95,14 @@ namespace HyperTools
         {
             if (pitchVariation > 0)
             {
-                SfxAudioSource.pitch = Utilities.GetNormalRandom(pitch, pitchVariation);
+                sfxAudioSource.pitch = Utilities.GetNormalRandom(pitch, pitchVariation);
             }
             else
             {
-                SfxAudioSource.pitch = pitch;
+                sfxAudioSource.pitch = pitch;
             }
 
-            SfxAudioSource.PlayOneShot(clip, volume);
+            sfxAudioSource.PlayOneShot(clip, volume);
         }
     }
 }

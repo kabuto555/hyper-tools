@@ -7,10 +7,11 @@ namespace HyperTools
      * things like hardware notches or severely rounded corners
      */
     [RequireComponent(typeof(RectTransform))]
+    [ExecuteAlways]
     public class SafeAreaFitter : MonoBehaviour
     {
-        [SerializeField] private bool RunInEditMode;
-        private RectTransform _rectTransform => transform as RectTransform;
+        [SerializeField] private bool updateInEditMode;
+        private RectTransform RectTransform => transform as RectTransform;
         private Rect _lastSafeAreaRect;
 
         private void Awake()
@@ -20,6 +21,11 @@ namespace HyperTools
 
         private void Update()
         {
+            if (Application.isEditor && !updateInEditMode && !Application.isPlaying)
+            {
+                return;
+            }
+            
             if (_lastSafeAreaRect != Screen.safeArea)
             {
                 FitToSafeArea();
@@ -38,8 +44,8 @@ namespace HyperTools
             anchorMax.x /= Screen.width;
             anchorMax.y /= Screen.height;
 
-            _rectTransform.anchorMin = anchorMin;
-            _rectTransform.anchorMax = anchorMax;
+            RectTransform.anchorMin = anchorMin;
+            RectTransform.anchorMax = anchorMax;
         }
     }
 }
