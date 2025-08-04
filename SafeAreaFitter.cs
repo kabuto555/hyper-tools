@@ -21,11 +21,6 @@ namespace HyperTools
 
         private void Update()
         {
-            if (Application.isEditor && !updateInEditMode && !Application.isPlaying)
-            {
-                return;
-            }
-            
             if (_lastSafeAreaRect != Screen.safeArea)
             {
                 FitToSafeArea();
@@ -34,6 +29,11 @@ namespace HyperTools
 
         private void FitToSafeArea()
         {
+            if (Application.isEditor && !updateInEditMode && !Application.isPlaying)
+            {
+                return;
+            }
+            
             Rect safeArea = Screen.safeArea;
 
             Vector2 anchorMin = safeArea.position;
